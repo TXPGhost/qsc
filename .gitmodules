@@ -1,0 +1,3 @@
+[submodule "tree-sitter-qs"]
+	path = tree-sitter-qs
+	url = git@github.com:TXPGhost/tree-sitter-qs.git
