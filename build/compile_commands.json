@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/home/alexander/Coding/qsc/build",
-  "command": "/usr/bin/c++ -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/alexander/Coding/qsc/include  -o CMakeFiles/qsc.dir/src/main.cpp.o -c /home/alexander/Coding/qsc/src/main.cpp",
-  "file": "/home/alexander/Coding/qsc/src/main.cpp",
-  "output": "CMakeFiles/qsc.dir/src/main.cpp.o"
-}
-]

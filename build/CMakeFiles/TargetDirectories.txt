@@ -1,7 +1,0 @@
-/home/alexander/Coding/qsc/build/CMakeFiles/intrinsics_gen.dir
-/home/alexander/Coding/qsc/build/CMakeFiles/omp_gen.dir
-/home/alexander/Coding/qsc/build/CMakeFiles/acc_gen.dir
-/home/alexander/Coding/qsc/build/CMakeFiles/RISCVTargetParserTableGen.dir
-/home/alexander/Coding/qsc/build/CMakeFiles/qsc.dir
-/home/alexander/Coding/qsc/build/CMakeFiles/edit_cache.dir
-/home/alexander/Coding/qsc/build/CMakeFiles/rebuild_cache.dir
