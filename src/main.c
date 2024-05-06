@@ -1,10 +1,23 @@
-#include <stdio.h>
-#include <tree_sitter/api.h>
-
-const TSLanguage* tree_sitter_qs(void);
+#include "log.h"
+#include "parser.h"
 
 int main(int argc, char* argv[]) {
-    TSParser parser = ts_parser_new();
+    if (argc < 2) {
+        ERROR("usage: qsc <file>");
+        return 1;
+    }
 
-    return 0;
+    FILE* input = fopen(argv[1], "r");
+    if (input == NULL) {
+        ERROR("unable to read input file \"%s\"", argv[1]);
+        return 1;
+    }
+
+    FILE* file = fopen(argv[1], "r");
+    Parser* parser = ParserNew(file);
+
+    Expr* ast = ParserParse(parser);
+
+    ParserFree(parser);
+    fclose(file);
 }
