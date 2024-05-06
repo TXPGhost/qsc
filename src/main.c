@@ -1,5 +1,7 @@
+#include "lexer.h"
 #include "log.h"
 #include "parser.h"
+#include "token.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -13,14 +15,36 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    FILE* file = fopen(argv[1], "r");
-    Parser* parser = ParserNew(file);
+    SET_LOG_LEVEL(LLTrace);
 
-    Expr* ast = ParserParse(parser);
-    fprintf(stdout, "\nPARSED EXPR\n\n");
-    ExprPrettyPrint(stdout, ast);
-    fprintf(stdout, "\n\n");
+    // Test lexer
+    {
 
-    ParserFree(parser);
-    fclose(file);
+        FILE* file = fopen(argv[1], "r");
+        Lexer* lexer = LexerNew(file);
+
+        Token tok = LexerGetTok(lexer);
+        while (tok != TokNone) {
+            TRACE("%s    \t'%s'", TokenGetKindString(tok),
+                  LexerGetTokString(lexer));
+            tok = LexerGetTok(lexer);
+        }
+
+        LexerFree(lexer);
+        fclose(file);
+    }
+
+    // Test parser
+    {
+        FILE* file = fopen(argv[1], "r");
+        Parser* parser = ParserNew(file);
+
+        Expr* ast = ParserParse(parser);
+        fprintf(stdout, "\nPARSED EXPR\n\n");
+        ExprPrettyPrint(stdout, ast);
+        fprintf(stdout, "\n\n");
+
+        ParserFree(parser);
+        fclose(file);
+    }
 }

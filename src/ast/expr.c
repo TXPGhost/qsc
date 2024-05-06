@@ -31,23 +31,30 @@ void ExprPrettyPrint(FILE* file, Expr* expr) {
         fprintf(file, "{\n");
         __expr_pretty_print_indent_level++;
         for (int i = 0; i < expr->expr.block.n; i++) {
-            for (int j = 0; j < __expr_pretty_print_indent_level; j++) {
-                fprintf(file, "    ");
+            if (expr->expr.block.exprs[i]->kind != ExprKindTuple &&
+                expr->expr.block.exprs[i]->expr.tuple.n != 0) {
+                for (int j = 0; j < __expr_pretty_print_indent_level; j++) {
+                    fprintf(file, "    ");
+                }
+                ExprPrettyPrint(file, expr->expr.block.exprs[i]);
+                if (i != expr->expr.block.n - 1) {
+                    fprintf(file, ";");
+                }
+                fprintf(file, "\n");
             }
-            ExprPrettyPrint(file, expr->expr.block.exprs[i]);
-            if (i != expr->expr.block.n - 1) {
-                fprintf(file, ";");
-            }
-            fprintf(file, "\n");
         }
         __expr_pretty_print_indent_level--;
         fprintf(file, "}");
         break;
     case ExprKindTuple:
-        for (int i = 0; i < expr->expr.tuple.n; i++) {
-            ExprPrettyPrint(file, expr->expr.tuple.exprs[i]);
-            if (i != expr->expr.tuple.n - 1) {
-                fprintf(file, ", ");
+        if (expr->expr.tuple.n == 0) {
+            fprintf(file, "()");
+        } else {
+            for (int i = 0; i < expr->expr.tuple.n; i++) {
+                ExprPrettyPrint(file, expr->expr.tuple.exprs[i]);
+                if (i != expr->expr.tuple.n - 1) {
+                    fprintf(file, ", ");
+                }
             }
         }
         break;
@@ -74,22 +81,27 @@ void ExprPrettyPrint(FILE* file, Expr* expr) {
         ExprPrettyPrint(file, expr->expr.add.lhs);
         fprintf(file, " + ");
         ExprPrettyPrint(file, expr->expr.add.rhs);
+        break;
     case ExprKindSub:
         ExprPrettyPrint(file, expr->expr.sub.lhs);
         fprintf(file, " - ");
         ExprPrettyPrint(file, expr->expr.sub.rhs);
+        break;
     case ExprKindMul:
         ExprPrettyPrint(file, expr->expr.mul.lhs);
         fprintf(file, " * ");
         ExprPrettyPrint(file, expr->expr.mul.rhs);
+        break;
     case ExprKindDiv:
         ExprPrettyPrint(file, expr->expr.div.lhs);
         fprintf(file, " / ");
         ExprPrettyPrint(file, expr->expr.div.rhs);
+        break;
     case ExprKindMod:
         ExprPrettyPrint(file, expr->expr.mod.lhs);
         fprintf(file, " %% ");
         ExprPrettyPrint(file, expr->expr.mod.rhs);
+        break;
     case ExprKindNeg:
         fprintf(file, "-");
         ExprPrettyPrint(file, expr->expr.neg.expr);

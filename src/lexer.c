@@ -119,17 +119,21 @@ Token LexerGetTok(Lexer* lexer) {
 
     if (isdigit(c)) {
         // Parse number
-        while (isdigit(c) || c == '_' || c == '.') {
+        char n = LexerPeekChar(lexer);
+        while (isdigit(n) || n == '_' || n == '.') {
             c = LexerGetChar(lexer);
+            n = LexerPeekChar(lexer);
         }
-        lexer->tok_string[lexer->tok_string_len - 1] = '\0';
+        lexer->tok_string[lexer->tok_string_len] = '\0';
         return TokNumber;
     } else if (isalpha(c) || c == '_') {
         // Parse ident
-        while (isalpha(c) || c == '_') {
+        char n = LexerPeekChar(lexer);
+        while (isalpha(n) || n == '_') {
             c = LexerGetChar(lexer);
+            n = LexerPeekChar(lexer);
         }
-        lexer->tok_string[lexer->tok_string_len - 1] = '\0';
+        lexer->tok_string[lexer->tok_string_len] = '\0';
         return TokIdent;
     } else if (c == '\"') {
         // Parse string
@@ -137,6 +141,7 @@ Token LexerGetTok(Lexer* lexer) {
         while (c != '\"') {
             c = LexerGetChar(lexer);
         }
+        lexer->tok_string[lexer->tok_string_len - 1] = '\0';
         return TokString;
     } else {
         // Unknown token
