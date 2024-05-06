@@ -1,6 +1,8 @@
 #ifndef EXPR_H
 #define EXPR_H
 
+#include <stdio.h>
+
 typedef struct Expr Expr;
 
 // name (identifier)
@@ -143,5 +145,7 @@ typedef struct Expr {
         ExprNeg neg;
     } expr;
 } Expr;
+
+void ExprPrettyPrint(FILE* file, Expr* e);
 
 #endif

@@ -70,11 +70,9 @@ Expr* ParserParseP9(Parser* parser) {
         *expr = (Expr){.kind = ExprKindString, .expr.string = string};
         return expr;
     } else {
-        ERROR("expected Ident, Number, String, or LParen");
+        ERROR("expected Ident, Number, or String");
         return NULL;
     }
-
-    INFO("DONE");
 }
 
 // Call
@@ -393,11 +391,13 @@ Expr* ParserParseP0(Parser* parser) {
     }
 
     // Fallback
-    return ParserParseP1(parser);
+    Expr* expr = ParserParseP1(parser);
+    return expr;
 }
 
 Expr* ParserParse(Parser* parser) {
     INFO("Parsing File...");
-    return ParserParseP0(parser);
+    Expr* expr = ParserParseP0(parser);
     INFO("Done parsing file.");
+    return expr;
 }

@@ -41,7 +41,7 @@ extern LogLevel __global_log_level;
 #define TRACE(format, ...)                                                     \
     do {                                                                       \
         if (__global_log_level <= LLTrace) {                                   \
-            __LOG_PRINT(stderr,                                                \
+            __LOG_PRINT(stdout,                                                \
                         GRAY "[" CYAN BOLD "TRACE" CLEAR GRAY "]" CLEAR,       \
                         format, ##__VA_ARGS__);                                \
         }                                                                      \
@@ -50,7 +50,7 @@ extern LogLevel __global_log_level;
 #define INFO(format, ...)                                                      \
     do {                                                                       \
         if (__global_log_level <= LLInfo) {                                    \
-            __LOG_PRINT(stderr,                                                \
+            __LOG_PRINT(stdout,                                                \
                         GRAY "[" GREEN BOLD "INFO" CLEAR GRAY "] " CLEAR,      \
                         format, ##__VA_ARGS__);                                \
         }                                                                      \

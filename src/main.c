@@ -17,6 +17,9 @@ int main(int argc, char* argv[]) {
     Parser* parser = ParserNew(file);
 
     Expr* ast = ParserParse(parser);
+    fprintf(stdout, "\nPARSED EXPR\n\n");
+    ExprPrettyPrint(stdout, ast);
+    fprintf(stdout, "\n\n");
 
     ParserFree(parser);
     fclose(file);
