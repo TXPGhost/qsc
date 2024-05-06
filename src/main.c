@@ -40,8 +40,13 @@ int main(int argc, char* argv[]) {
         Parser* parser = ParserNew(file);
 
         Expr* ast = ParserParse(parser);
-        fprintf(stdout, "\nPARSED EXPR\n\n");
+
+        fprintf(stdout, "\nPRETTY PRINT\n\n");
         ExprPrettyPrint(stdout, ast);
+        fprintf(stdout, "\n");
+
+        fprintf(stdout, "\nAST\n\n");
+        ExprASTPrint(stdout, ast);
         fprintf(stdout, "\n\n");
 
         ParserFree(parser);

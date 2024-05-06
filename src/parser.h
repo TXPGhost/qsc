@@ -7,8 +7,8 @@
 typedef struct {
     Lexer* lexer;
     Token next_tok;
-    char cur_tok_string[TOK_STRING_MAX_LEN];
-    char next_tok_string[TOK_STRING_MAX_LEN];
+    char cur_tok_string[TOK_STRING_MAX_LEN + 1];
+    char next_tok_string[TOK_STRING_MAX_LEN + 1];
 } Parser;
 
 Parser* ParserNew(FILE* file);

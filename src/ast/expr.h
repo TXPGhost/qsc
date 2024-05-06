@@ -146,6 +146,7 @@ typedef struct Expr {
     } expr;
 } Expr;
 
+void ExprASTPrint(FILE* file, Expr* expr);
 void ExprPrettyPrint(FILE* file, Expr* expr);
 
 #endif

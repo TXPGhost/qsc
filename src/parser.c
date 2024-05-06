@@ -16,6 +16,8 @@ Parser* ParserNew(FILE* file) {
         .cur_tok_string = '\0',
         .next_tok_string = '\0',
     };
+    memset(parser->cur_tok_string, '\0', TOK_STRING_MAX_LEN + 1);
+    memset(parser->next_tok_string, '\0', TOK_STRING_MAX_LEN + 1);
     strcpy(parser->next_tok_string, LexerGetTokString(lexer));
     return parser;
 }
@@ -39,7 +41,7 @@ Token ParserPeekTok(Parser* parser) {
     return parser->next_tok;
 }
 
-Expr* ParserParseP1(Parser* parser);
+Expr* ParserParseP0(Parser* parser);
 
 // Paren, Curly, Bracket
 Expr* ParserParseP10(Parser* parser) {
@@ -60,7 +62,7 @@ Expr* ParserParseP10(Parser* parser) {
             return expr;
         }
 
-        Expr* expr = ParserParseP1(parser);
+        Expr* expr = ParserParseP0(parser);
         if (ParserPeekTok(parser) != TokRParen) {
             ERROR("expected RParen");
             return NULL;
@@ -76,7 +78,7 @@ Expr* ParserParseP10(Parser* parser) {
         TRACE("Begin Curly...");
         ParserGetTok(parser);
 
-        Expr* expr = ParserParseP1(parser);
+        Expr* expr = ParserParseP0(parser);
         if (ParserPeekTok(parser) != TokRCurly) {
             ERROR("expected RCurly");
             return NULL;
@@ -92,7 +94,7 @@ Expr* ParserParseP10(Parser* parser) {
         TRACE("Begin Bracket...");
         ParserGetTok(parser);
 
-        Expr* expr = ParserParseP1(parser);
+        Expr* expr = ParserParseP0(parser);
         if (ParserPeekTok(parser) != TokRBracket) {
             ERROR("expected RBracket");
             return NULL;
@@ -371,10 +373,35 @@ Expr* ParserParseP3(Parser* parser) {
     return first;
 }
 
-// Def, Assn
+// Func
 Expr* ParserParseP2(Parser* parser) {
+    // Parse arg
+    Expr* arg = ParserParseP3(parser);
+    Token tok = ParserPeekTok(parser);
+
+    if (tok == TokArrow) {
+        TRACE("Parsing Func...");
+        // Eat arrow
+        ParserGetTok(parser);
+
+        // Parse body
+        Expr* body = ParserParseP2(parser);
+
+        // Return expr
+        Expr* expr = malloc(sizeof(Expr));
+        ExprFunc func = (ExprFunc){.arg = arg, .body = body};
+        *expr = (Expr){.kind = ExprKindFunc, .expr.func = func};
+        return expr;
+    }
+
+    // Fallback
+    return arg;
+}
+
+// Def, Assn
+Expr* ParserParseP1(Parser* parser) {
     // Parse lhs
-    Expr* lhs = ParserParseP3(parser);
+    Expr* lhs = ParserParseP2(parser);
     Token tok = ParserPeekTok(parser);
 
     if (tok == TokEquals || tok == TokSetEquals) {
@@ -390,7 +417,7 @@ Expr* ParserParseP2(Parser* parser) {
         ParserGetTok(parser);
 
         // Parse rhs
-        Expr* rhs = ParserParseP3(parser);
+        Expr* rhs = ParserParseP2(parser);
 
         // Return expr
         Expr* expr = malloc(sizeof(Expr));
@@ -410,9 +437,9 @@ Expr* ParserParseP2(Parser* parser) {
 }
 
 // Block
-Expr* ParserParseP1(Parser* parser) {
+Expr* ParserParseP0(Parser* parser) {
     // Parse first expr
-    Expr* first = ParserParseP2(parser);
+    Expr* first = ParserParseP1(parser);
     Token tok = ParserPeekTok(parser);
 
     if (tok == TokSemicolon) {
@@ -438,7 +465,7 @@ Expr* ParserParseP1(Parser* parser) {
             ParserGetTok(parser);
 
             // Parse next expr
-            first = ParserParseP2(parser);
+            first = ParserParseP1(parser);
             tok = ParserPeekTok(parser);
 
             // If the expr is NULL, make it unit expr
@@ -466,7 +493,7 @@ Expr* ParserParseP1(Parser* parser) {
 
 Expr* ParserParse(Parser* parser) {
     // Parse file
-    Expr* expr = ParserParseP1(parser);
+    Expr* expr = ParserParseP0(parser);
 
     // Make sure nothing left over
     Token tok = ParserPeekTok(parser);
