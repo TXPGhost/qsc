@@ -27,8 +27,16 @@ void ExprASTPrint(FILE* file, Expr* expr) {
         break;
     case ExprKindLabel:
         ExprASTPrintIndent(file);
-        fprintf(file, "%s: ", expr->expr.label.label.name);
+        fprintf(file, "LABEL\n");
+        __expr_pretty_print_indent_level++;
+        ExprASTPrintIndent(file);
+        fprintf(file, "LABEL %s\n", expr->expr.label.label.name);
+        ExprASTPrintIndent(file);
+        fprintf(file, "EXPR\n");
+        __expr_pretty_print_indent_level++;
         ExprASTPrint(file, expr->expr.label.expr);
+        __expr_pretty_print_indent_level--;
+        __expr_pretty_print_indent_level--;
         break;
     case ExprKindDef:
         ExprASTPrintIndent(file);

@@ -44,7 +44,7 @@ Token ParserPeekTok(Parser* parser) {
 Expr* ParserParseP0(Parser* parser);
 
 // Paren, Curly, Bracket
-Expr* ParserParseP10(Parser* parser) {
+Expr* ParserParseP11(Parser* parser) {
     Token tok = ParserPeekTok(parser);
 
     // Parse groupings
@@ -111,7 +111,7 @@ Expr* ParserParseP10(Parser* parser) {
 }
 
 // Ident, Number, String, Paren
-Expr* ParserParseP9(Parser* parser) {
+Expr* ParserParseP10(Parser* parser) {
     Expr* expr = malloc(sizeof(Expr));
     Token tok = ParserPeekTok(parser);
 
@@ -154,19 +154,19 @@ Expr* ParserParseP9(Parser* parser) {
     }
 
     // Fallback
-    return ParserParseP10(parser);
+    return ParserParseP11(parser);
 }
 
 // Call
-Expr* ParserParseP8(Parser* parser) {
-    Expr* expr = ParserParseP9(parser);
+Expr* ParserParseP9(Parser* parser) {
+    Expr* expr = ParserParseP10(parser);
     Token tok = ParserPeekTok(parser);
 
     while (tok == TokLParen) {
         TRACE("Parsing Call...");
 
         // Parse argument
-        Expr* arg = ParserParseP10(parser);
+        Expr* arg = ParserParseP11(parser);
 
         ExprCall call = (ExprCall){.func = expr, .arg = arg};
 
@@ -180,7 +180,7 @@ Expr* ParserParseP8(Parser* parser) {
 }
 
 // Neg
-Expr* ParserParseP7(Parser* parser) {
+Expr* ParserParseP8(Parser* parser) {
     Token tok = ParserPeekTok(parser);
 
     if (tok == TokSub) {
@@ -189,20 +189,20 @@ Expr* ParserParseP7(Parser* parser) {
         // Eat negative sign
         ParserGetTok(parser);
 
-        ExprNeg neg = (ExprNeg){.expr = ParserParseP7(parser)};
+        ExprNeg neg = (ExprNeg){.expr = ParserParseP8(parser)};
         Expr* expr = malloc(sizeof(Expr));
         *expr = (Expr){.kind = ExprKindNeg, .expr.neg = neg};
         return expr;
     }
 
     // Fallback
-    return ParserParseP8(parser);
+    return ParserParseP9(parser);
 }
 
 // Mul, Div, Mod
-Expr* ParserParseP6(Parser* parser) {
+Expr* ParserParseP7(Parser* parser) {
     // Parse lhs
-    Expr* lhs = ParserParseP7(parser);
+    Expr* lhs = ParserParseP8(parser);
     Token tok = ParserPeekTok(parser);
 
     if (tok == TokMul || tok == TokDiv || tok == TokMod) {
@@ -211,7 +211,7 @@ Expr* ParserParseP6(Parser* parser) {
         ParserGetTok(parser);
 
         // Parse rhs
-        Expr* rhs = ParserParseP6(parser);
+        Expr* rhs = ParserParseP7(parser);
 
         // Return expr
         Expr* expr = malloc(sizeof(Expr));
@@ -235,9 +235,9 @@ Expr* ParserParseP6(Parser* parser) {
 }
 
 // Add, Sub
-Expr* ParserParseP5(Parser* parser) {
+Expr* ParserParseP6(Parser* parser) {
     // Parse lhs
-    Expr* lhs = ParserParseP6(parser);
+    Expr* lhs = ParserParseP7(parser);
     Token tok = ParserPeekTok(parser);
 
     if (tok == TokAdd || tok == TokSub) {
@@ -246,7 +246,7 @@ Expr* ParserParseP5(Parser* parser) {
         ParserGetTok(parser);
 
         // Parse rhs
-        Expr* rhs = ParserParseP5(parser);
+        Expr* rhs = ParserParseP6(parser);
 
         // Return expr
         Expr* expr = malloc(sizeof(Expr));
@@ -263,6 +263,37 @@ Expr* ParserParseP5(Parser* parser) {
 
     // Fallback
     return lhs;
+}
+
+// Label
+Expr* ParserParseP5(Parser* parser) {
+    // Parse label
+    Expr* ident = ParserParseP6(parser);
+    Token tok = ParserPeekTok(parser);
+
+    if (tok == TokColon) {
+        // This is a label
+        TRACE("Parsing Label...");
+
+        // Eat colon
+        ParserGetTok(parser);
+
+        // Make sure label is an ident
+        if (ident->kind != ExprKindIdent) {
+            ERROR("expected Ident");
+            return NULL;
+        }
+
+        // Parse expr
+        Expr* expr = malloc(sizeof(Expr));
+        *expr =
+            (Expr){.kind = ExprKindLabel,
+                   .expr.label = (ExprLabel){.label = ident->expr.ident,
+                                             .expr = ParserParseP6(parser)}};
+        return expr;
+    }
+
+    return ident;
 }
 
 // Tuple
@@ -348,7 +379,7 @@ Expr* ParserParseP3(Parser* parser) {
             ParserGetTok(parser);
 
             // Parse next expr
-            first = ParserParseP5(parser);
+            first = ParserParseP6(parser);
             tok = ParserPeekTok(parser);
 
             // If the expr is NULL, make it unit expr
